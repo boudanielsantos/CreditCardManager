@@ -7,7 +7,7 @@ import com.example.creditcardmanager.data.CreditCardDao
 import com.example.creditcardmanager.data.DateConverter
 import com.example.creditcardmanager.model.CreditCard
 
-@Database(entities = [CreditCard::class], version = 1, exportSchema = false)
+@Database(entities = [CreditCard::class], version = 2, exportSchema = false)
 @TypeConverters(DateConverter::class)
 abstract class CreditCardManagerDatabase : RoomDatabase() {
 

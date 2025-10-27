@@ -1,50 +1,99 @@
 package com.example.creditcardmanager.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.creditcardmanager.R
 import com.example.creditcardmanager.ui.theme.LightBlue
 
 
+@Composable
+fun InputField(
+    modifier: Modifier = Modifier,
+    valueState: MutableState<String>,
+    label: String,
+    enabled: Boolean = true,
+    isSingleLine: Boolean = true,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Next,
+    maxCharacter: Int = 99,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    onAction: KeyboardActions = KeyboardActions.Default,
+    onValueChange: (String) -> Unit = { valueState.value = it }
+) {
+    OutlinedTextField(
+        value = valueState.value, onValueChange = { newValue ->
+            if (newValue.length <= maxCharacter) {
+                onValueChange(newValue)
+            }
+        },
+        label = { Text(text = label) },
+        singleLine = isSingleLine,
+        modifier = modifier
+            .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
+            .fillMaxWidth(),
+        textStyle = TextStyle(fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground),
+        enabled = enabled,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
+        keyboardActions = onAction,
+        visualTransformation = visualTransformation
+    )
+
+}
+
+//Used in Splash Screen
 @Composable
 fun CreditCardManagerLogo() {
     Card(shape = CircleShape) {
@@ -80,6 +129,8 @@ fun CreditCardManagerAppBar(
     title: String,
     icon: ImageVector?,
     showHome: Boolean = true,
+    showSave: Boolean = false,
+    onNavigateToHome: () -> Unit = {},
     onBackArrowClicked: () -> Unit = {}
 ) {
     var showMenu = remember { mutableStateOf(false) }
@@ -94,7 +145,7 @@ fun CreditCardManagerAppBar(
                     Icon(
                         imageVector = icon,
                         contentDescription = "icon",
-                        tint = Color.Red.copy(alpha = 0.7f),
+                        tint = Color.LightGray.copy(alpha = 0.8f),
                         modifier = Modifier.clickable {
                             onBackArrowClicked.invoke()
                         }
@@ -112,27 +163,113 @@ fun CreditCardManagerAppBar(
             }
         },
         actions = {
-            Box(modifier = Modifier.wrapContentSize()) {
-                IconButton(onClick = { showMenu.value = !showMenu.value }) {
-                    Icon(Icons.Filled.MoreVert, contentDescription = "More options")
-                }
-                DropdownMenu(
-                    expanded = showMenu.value,
-                    onDismissRequest = { showMenu.value = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("Settings") },
-                        onClick = { /* Handle settings click */ showMenu.value = false }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("About") },
-                        onClick = { /* Handle about click */ showMenu.value = false }
-                    )
-                    // Add more menu items as needed
+            if (showHome) {
+                Box(modifier = Modifier.wrapContentSize()) {
+                    IconButton(onClick = { showMenu.value = !showMenu.value }) {
+                        Icon(Icons.Filled.MoreVert, contentDescription = "More options")
+                    }
+                    DropdownMenu(
+                        expanded = showMenu.value,
+                        onDismissRequest = { showMenu.value = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Settings") },
+                            onClick = { /* Handle settings click */ showMenu.value = false }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("About") },
+                            onClick = { /* Handle about click */ showMenu.value = false }
+                        )
+                        // Add more menu items as needed
+                    }
                 }
             }
+            if (showSave) {
+                Icon(
+                    modifier = Modifier
+                        .width(30.dp)
+                        .height(30.dp)
+                        .clickable { onNavigateToHome() },
+                    imageVector = Icons.Filled.Save,
+                    contentDescription = "Save",
+                    tint = Color.LightGray.copy(alpha = 0.8f)
+                )
+            }
+
         },
         modifier = Modifier.shadow(elevation = 0.dp),
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
     )
 }
+
+@Composable
+fun CardLogo(cardIcon: Int) {
+    Surface(
+        modifier = Modifier
+            .padding(10.dp)
+            .height(100.dp)
+            .width(100.dp),
+        shape = CircleShape,
+        border = BorderStroke(3.dp, color = Color.LightGray.copy(0.6f))
+    ) {
+        Image(painterResource(cardIcon), contentDescription = "Credit Card Icon")
+
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropdownField(label: String, options: List<String>, selectedValue: MutableState<String>) {
+    var expanded by remember { mutableStateOf(false) }
+
+    // Filter options based on the input text
+    val filteredOptions = options.filter {
+        it.contains(selectedValue.value, ignoreCase = true)
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                value = selectedValue.value,
+                onValueChange = { newValue ->
+                    selectedValue.value = newValue
+                    expanded = true
+                },
+                label = { Text(label) },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                modifier = Modifier
+                    .menuAnchor() // Important for anchoring the dropdown
+                    .fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                if (filteredOptions.isEmpty()) {
+                    DropdownMenuItem(
+                        text = { Text("No results found") },
+                        onClick = { expanded = false },
+                        enabled = false
+                    )
+                } else {
+                    filteredOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                selectedValue.value = option
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+

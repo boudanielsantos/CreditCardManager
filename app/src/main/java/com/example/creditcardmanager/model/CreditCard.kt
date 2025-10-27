@@ -11,9 +11,9 @@ data class CreditCard(
     val description: String?,
     val creditLimit: Double,
     val lastFourDigits: String,
-    val expiryDate: Date,
-    val dueDate: Date,
-    val statementDate: Date,
+    val expiryDate: String,
+    val dueDay: Int,
+    val statementDay: Int,
     val cardType: CreditCardType,
     val cardStatus: CreditCardStatus
 )

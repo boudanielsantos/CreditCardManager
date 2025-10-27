@@ -32,14 +32,16 @@ fun CreditCardManagerNavigation() {
                 onNavigateToAddCard = {
                     navController.navigate(CreditCardScreens.ADD_CARD_SCREEN.name)
                 },
-                onNavigateToUpdateCard = { cardId -> // The 'it' is the ID, e.g., 2
+                onNavigateToUpdateCard = { cardId ->
                     navController.navigate("${CreditCardScreens.UPDATE_CARD_SCREEN.name}/$cardId")
                 }
             )
         }
 
         composable(route = CreditCardScreens.ADD_CARD_SCREEN.name) {
-            AddCardScreen()
+            AddCardScreen(onNavigateToHome = {
+                navController.navigate(CreditCardScreens.HOME_SCREEN.name)
+            })
         }
 
         val route = CreditCardScreens.UPDATE_CARD_SCREEN.name
