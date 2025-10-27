@@ -3,12 +3,15 @@ package com.example.creditcardmanager.navigation
 import android.window.SplashScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHost
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.creditcardmanager.screens.add.AddCardScreen
 import com.example.creditcardmanager.screens.home.HomeScreen
 import com.example.creditcardmanager.screens.splash.SplashScreen
+import com.example.creditcardmanager.screens.update.UpdateScreen
 
 @Composable
 fun CreditCardManagerNavigation() {
@@ -25,12 +28,32 @@ fun CreditCardManagerNavigation() {
             )
         }
         composable(route = CreditCardScreens.HOME_SCREEN.name) {
-            HomeScreen(onNavigateToAddCard = {
-                navController.navigate(CreditCardScreens.ADD_CARD_SCREEN.name)
-            })
+            HomeScreen(
+                onNavigateToAddCard = {
+                    navController.navigate(CreditCardScreens.ADD_CARD_SCREEN.name)
+                },
+                onNavigateToUpdateCard = { cardId -> // The 'it' is the ID, e.g., 2
+                    navController.navigate("${CreditCardScreens.UPDATE_CARD_SCREEN.name}/$cardId")
+                }
+            )
         }
+
         composable(route = CreditCardScreens.ADD_CARD_SCREEN.name) {
             AddCardScreen()
+        }
+
+        val route = CreditCardScreens.UPDATE_CARD_SCREEN.name
+        composable(
+            route = "$route/{cardId}",
+            arguments = listOf(
+                navArgument("cardId") {
+                    type = NavType.IntType
+                }
+            )) {
+            val cardId = it.arguments?.getInt("cardId")
+            cardId?.let {
+                UpdateScreen(it)
+            }
         }
     }
 }
