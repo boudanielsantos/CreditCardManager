@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.example.creditcardmanager.screens.add.AddCardScreen
 import com.example.creditcardmanager.screens.add.AddCardViewModel
 import com.example.creditcardmanager.screens.home.HomeScreen
+import com.example.creditcardmanager.screens.home.HomeViewModel
 import com.example.creditcardmanager.screens.splash.SplashScreen
 import com.example.creditcardmanager.screens.update.UpdateScreen
 
@@ -30,7 +31,10 @@ fun CreditCardManagerNavigation() {
             )
         }
         composable(route = CreditCardScreens.HOME_SCREEN.name) {
+            val homeViewModel = hiltViewModel<HomeViewModel>()
+
             HomeScreen(
+                viewModel = homeViewModel,
                 onNavigateToAddCard = {
                     navController.navigate(CreditCardScreens.ADD_CARD_SCREEN.name)
                 },

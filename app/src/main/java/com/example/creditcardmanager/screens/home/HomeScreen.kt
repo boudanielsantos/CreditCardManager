@@ -3,10 +3,12 @@ package com.example.creditcardmanager.screens.home
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -19,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,59 +45,52 @@ import com.example.creditcardmanager.utils.Utils
 import java.util.Date
 
 @Composable
-fun HomeScreen(onNavigateToAddCard: () -> Unit, onNavigateToUpdateCard: (Int) -> Unit) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onNavigateToAddCard: () -> Unit,
+    onNavigateToUpdateCard: (Int) -> Unit
+) {
     Scaffold(topBar = {
         CreditCardManagerAppBar(title = "Credit Card Manager", showHome = true, icon = null)
     }, floatingActionButton = {
         FABContent { onNavigateToAddCard() }
     }) { innerPadding ->
-        HomeContent(innerPadding, onNavigateToUpdateCard)
+        val cardList = viewModel.creditCards.collectAsState().value.data
+
+        HomeContent(innerPadding, cardList, onNavigateToUpdateCard = onNavigateToUpdateCard)
     }
 }
 
 @Composable
-fun HomeContent(paddingValues: PaddingValues, onNavigateToUpdateCard: (Int) -> Unit) {
+fun HomeContent(
+    paddingValues: PaddingValues,
+    cardList: List<CreditCard>? = emptyList(),
+    onNavigateToUpdateCard: (Int) -> Unit
+) {
     Column(
-        modifier = Modifier.padding(paddingValues),
+        modifier = Modifier
+            .padding(paddingValues)
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        //TODO LOAD AVAILABLE CARDS FROM DB
-
-
-        val cardList = mutableListOf(
-            CreditCard(
-                id = 1,
-                cardName = "BDO VISA",
-                description = "Card for collecting points",
-                creditLimit = 1500000.00,
-                lastFourDigits = "5555",
-                expiryDate = "12/2023",
-                dueDay = 5,
-                statementDay = 6,
-                cardType = CreditCardType.DINERS_CLUB_INTERNATIONAL,
-                cardStatus = CreditCardStatus.UNPAID,
-            ),
-            CreditCard(
-                id = 2,
-                cardName = "Chinabank",
-                description = "Card for dining",
-                creditLimit = 300000.00,
-                lastFourDigits = "5325",
-                expiryDate = "22/2025",
-                dueDay = 1,
-                statementDay = 5 ,
-                cardType = CreditCardType.JCB,
-                cardStatus = CreditCardStatus.SETTLED
+        if (cardList.isNullOrEmpty()) {
+            Text(
+                "No Credit Cards Added",
+                color = Color.LightGray.copy(0.8f)
             )
-        )
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-            items(items = cardList) { card ->
-                CardItem(card, onNavigateToUpdateCard)
+        } else {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                items(items = cardList) { card ->
+                    CardItem(card, onNavigateToUpdateCard)
+                }
             }
         }
 
+
     }
+
+
 }
 
 @Preview
