@@ -129,10 +129,11 @@ fun CreditCardManagerAppBar(
     title: String,
     icon: ImageVector?,
     showHome: Boolean = true,
+    onSaveClicked: () -> Unit = {},
     showSave: Boolean = false,
-    onNavigateToHome: () -> Unit = {},
-    onBackArrowClicked: () -> Unit = {}
-) {
+    onBackArrowClicked: () -> Unit = {},
+
+    ) {
     var showMenu = remember { mutableStateOf(false) }
 
     TopAppBar(
@@ -189,7 +190,7 @@ fun CreditCardManagerAppBar(
                     modifier = Modifier
                         .width(30.dp)
                         .height(30.dp)
-                        .clickable { onNavigateToHome() },
+                        .clickable { onSaveClicked() },
                     imageVector = Icons.Filled.Save,
                     contentDescription = "Save",
                     tint = Color.LightGray.copy(alpha = 0.8f)
