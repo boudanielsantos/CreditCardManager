@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">CreditCardManager</string>
+    <string name="delete_dialog_title">Delete Card</string>
+    <string name="delete_dialog_message_single">Are you sure you want to delete this card?</string>
+    <string name="delete_dialog_title_all_card">Delete All Cards</string>
+    <string name="delete_dialog_message_all">Are you sure you want to delete all cards?</string>
 </resources>

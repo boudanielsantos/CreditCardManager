@@ -18,4 +18,8 @@ class CreditCardRepository @Inject constructor(val creditCardDao: CreditCardDao)
 
     suspend fun deleteAllCreditCards() =
         creditCardDao.deleteAllCreditCards()
+
+    suspend fun updateCreditCard(creditCard: CreditCard) =
+        creditCardDao.updateCreditCard(creditCard)
+
 }

@@ -15,18 +15,26 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -35,13 +43,17 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.creditcardmanager.R
 import com.example.creditcardmanager.components.CardLogo
 import com.example.creditcardmanager.components.CreditCardManagerAppBar
 import com.example.creditcardmanager.components.FABContent
+import com.example.creditcardmanager.components.ShowAlertDialog
 import com.example.creditcardmanager.model.CreditCard
 import com.example.creditcardmanager.model.CreditCardStatus
 import com.example.creditcardmanager.model.CreditCardType
 import com.example.creditcardmanager.utils.Utils
+import java.util.Calendar
 import java.util.Date
 
 @Composable
@@ -57,7 +69,12 @@ fun HomeScreen(
     }) { innerPadding ->
         val cardList = viewModel.creditCards.collectAsState().value.data
 
-        HomeContent(innerPadding, cardList, onNavigateToUpdateCard = onNavigateToUpdateCard)
+        HomeContent(
+            innerPadding,
+            cardList,
+            viewModel = viewModel,
+            onNavigateToUpdateCard = onNavigateToUpdateCard
+        )
     }
 }
 
@@ -65,24 +82,52 @@ fun HomeScreen(
 fun HomeContent(
     paddingValues: PaddingValues,
     cardList: List<CreditCard>? = emptyList(),
+    viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToUpdateCard: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier
             .padding(paddingValues)
             .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (cardList.isNullOrEmpty()) {
-            Text(
-                "No Credit Cards Added",
-                color = Color.LightGray.copy(0.8f)
-            )
+
+            Box (modifier = Modifier.fillMaxSize(),contentAlignment = Alignment.Center){
+                Text(
+                    "No Credit Cards Added",
+                    color = Color.LightGray.copy(0.8f)
+                )
+            }
+
         } else {
+            val openDialog = remember {
+                mutableStateOf(false)
+            }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
                 items(items = cardList) { card ->
-                    CardItem(card, onNavigateToUpdateCard)
+                    CardItem(
+                        card,
+                        onDeleteCardClicked = {
+                            openDialog.value = true
+
+                        },
+                        onMarkAsSettledClicked = {
+                            viewModel.updateCreditCard(card.copy(cardStatus = CreditCardStatus.SETTLED))
+                        },
+                        onNavigateToUpdateCard = onNavigateToUpdateCard
+                    )
+                    if (openDialog.value) {
+                        ShowAlertDialog(
+                            title = stringResource(R.string.delete_dialog_title),
+                            message = stringResource(R.string.delete_dialog_message_single),
+                            openDialog = openDialog
+                        ) {
+                            viewModel.deleteCreditCard(card)
+                            openDialog.value = false
+                        }
+                    }
                 }
             }
         }
@@ -93,24 +138,18 @@ fun HomeContent(
 
 }
 
-@Preview
 @Composable
 fun CardItem(
-    card: CreditCard = CreditCard(
-        cardName = "BDO VISA",
-        description = "Card for collecting points",
-        creditLimit = 1500000.00,
-        lastFourDigits = "5555",
-        expiryDate = "12312",
-        dueDay = 5,
-        statementDay = 5,
-        cardType = CreditCardType.DINERS_CLUB_INTERNATIONAL,
-        cardStatus = CreditCardStatus.UNPAID,
-    ),
+    card: CreditCard,
+    onMarkAsSettledClicked: () -> Unit = {},
+    onDeleteCardClicked: () -> Unit = {},
     onNavigateToUpdateCard: (Int) -> Unit = {}
 ) {
     val cardIcon = remember {
         mutableStateOf(0)
+    }
+    val showMenu = remember {
+        mutableStateOf(false)
     }
 
     Card(
@@ -131,21 +170,73 @@ fun CardItem(
                 CardLogo(cardIcon.value)
                 Spacer(modifier = Modifier.width(20.dp))
                 CardSummary(card)
+                ShowUpdateAndDeleteMenu(
+                    showMenu, card.cardStatus,
+                    onDeleteCardClicked = onDeleteCardClicked
+                ) {
+                    onMarkAsSettledClicked()
+                }
+
             }
+        }
+
+
+    }
+}
+
+@Composable
+fun ShowUpdateAndDeleteMenu(
+    showMenu: MutableState<Boolean>, cardStatus: CreditCardStatus,
+    onDeleteCardClicked: () -> Unit,
+    onMarkAsSettledClicked: () -> Unit
+) {
+    Row(horizontalArrangement = Arrangement.End) {
+        IconButton(
+            onClick = { showMenu.value = true },
+            modifier = Modifier
+
+                .padding(8.dp)
+        ) {
+            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More")
+        }
+
+        DropdownMenu(
+            expanded = showMenu.value,
+            onDismissRequest = { showMenu.value = false }
+        ) {
+
+            if (cardStatus.name == CreditCardStatus.UNPAID.name) {
+                DropdownMenuItem(
+                    text = { Text("Mark as Settled") },
+                    onClick = {
+                        onMarkAsSettledClicked()
+                        showMenu.value = false
+                    }
+                )
+            }
+            DropdownMenuItem(
+                text = { Text("Delete") },
+                onClick = {
+                    onDeleteCardClicked()
+                    showMenu.value = false
+                }
+            )
+
         }
     }
 }
 
 @Composable
 fun CardSummary(card: CreditCard) {
+    val currentMonth = Calendar.MONTH
     Column(modifier = Modifier.padding(10.dp)) {
         Text(
             text = card.cardName,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
-            fontSize = 20.sp,
-            overflow = TextOverflow.Ellipsis
+            fontSize = 15.sp,
+            overflow = TextOverflow.Clip
         )
 
         Text(modifier = Modifier.padding(bottom = 5.dp), text = buildAnnotatedString {
@@ -153,7 +244,7 @@ fun CardSummary(card: CreditCard) {
                 append(text = "Statement Date: ")
             }
             withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                append(card.statementDay.toString())
+                append("${Utils.getCurrentMonth()} ${card.statementDay}")
             }
         })
         Text(modifier = Modifier.padding(bottom = 5.dp), text = buildAnnotatedString {
@@ -161,7 +252,7 @@ fun CardSummary(card: CreditCard) {
                 append(text = "Due Date: ")
             }
             withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                append(card.dueDay.toString())
+                append("${Utils.getCurrentMonth()} ${card.dueDay}")
             }
         })
 
@@ -182,7 +273,6 @@ fun CardSummary(card: CreditCard) {
                 }
             },
         )
-
     }
 
 }

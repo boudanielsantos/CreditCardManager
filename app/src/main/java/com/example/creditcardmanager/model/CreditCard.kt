@@ -7,13 +7,13 @@ import java.util.Date
 @Entity(tableName = "credit_card")
 data class CreditCard(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
-    val cardName: String,
-    val description: String?,
-    val creditLimit: Double,
-    val lastFourDigits: String,
-    val expiryDate: String,
-    val dueDay: Int,
-    val statementDay: Int,
-    val cardType: CreditCardType,
-    val cardStatus: CreditCardStatus
+    var cardName: String,
+    var description: String?,
+    var creditLimit: Double,
+    var lastFourDigits: String,
+    var expiryDate: String,
+    var dueDay: Int,
+    var statementDay: Int,
+    var cardType: CreditCardType,
+    var cardStatus: CreditCardStatus
 )

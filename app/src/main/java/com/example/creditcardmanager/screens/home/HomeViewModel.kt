@@ -13,7 +13,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(cardRepository: CreditCardRepository) : ViewModel() {
+class HomeViewModel @Inject constructor(private val cardRepository: CreditCardRepository) :
+    ViewModel() {
 
     private val _creditCards =
         MutableStateFlow<DataOrException<List<CreditCard>, Boolean, Exception>>(
@@ -47,4 +48,13 @@ class HomeViewModel @Inject constructor(cardRepository: CreditCardRepository) : 
 
     }
 
+    fun updateCreditCard(creditCard: CreditCard) =
+        viewModelScope.launch { cardRepository.updateCreditCard(creditCard) }
+
+
+    fun deleteCreditCard(creditCard: CreditCard) =
+        viewModelScope.launch { cardRepository.deleteCreditCard(creditCard) }
+
+    fun deleteAllCreditCard() =
+        viewModelScope.launch { cardRepository.deleteAllCreditCards() }
 }

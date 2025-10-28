@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -33,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -206,6 +208,7 @@ fun CreditCardManagerAppBar(
 @Composable
 fun CardLogo(cardIcon: Int) {
     Surface(
+        color = Color.White,
         modifier = Modifier
             .padding(10.dp)
             .height(100.dp)
@@ -272,5 +275,26 @@ fun DropdownField(label: String, options: List<String>, selectedValue: MutableSt
             }
         }
     }
+}
+
+@Composable
+fun ShowAlertDialog(
+    title: String,
+    message: String, openDialog: MutableState<Boolean>,
+    onYesPressed: () -> Unit
+) {
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = { openDialog.value = false },
+            title = { Text(text = title) },
+            text = { Text(text = message) },
+            dismissButton = {
+                TextButton(onClick = { openDialog.value = false }) { Text("No") }
+            },
+            confirmButton = {
+                TextButton(onClick = onYesPressed) { Text("Yes") }
+            })
+    }
+
 }
 
