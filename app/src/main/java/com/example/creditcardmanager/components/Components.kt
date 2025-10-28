@@ -66,6 +66,8 @@ fun InputField(
     modifier: Modifier = Modifier,
     valueState: MutableState<String>,
     label: String,
+    isRequired: Boolean = false,
+    validState: MutableState<Boolean> = mutableStateOf(true),
     enabled: Boolean = true,
     isSingleLine: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text,
@@ -75,10 +77,18 @@ fun InputField(
     onAction: KeyboardActions = KeyboardActions.Default,
     onValueChange: (String) -> Unit = { valueState.value = it }
 ) {
+
     OutlinedTextField(
         value = valueState.value, onValueChange = { newValue ->
+            validState.value = !newValue.isEmpty()
             if (newValue.length <= maxCharacter) {
                 onValueChange(newValue)
+            }
+        },
+        isError = !validState.value,
+        supportingText = {
+            if (isRequired && !validState.value) {
+                Text(text = "This field is required")
             }
         },
         label = { Text(text = label) },
@@ -133,6 +143,7 @@ fun CreditCardManagerAppBar(
     showHome: Boolean = true,
     onSaveClicked: () -> Unit = {},
     showSave: Boolean = false,
+    isSaveEnabled: Boolean = false,
     onBackArrowClicked: () -> Unit = {},
 
     ) {
@@ -188,15 +199,23 @@ fun CreditCardManagerAppBar(
                 }
             }
             if (showSave) {
-                Icon(
-                    modifier = Modifier
-                        .width(30.dp)
-                        .height(30.dp)
-                        .clickable { onSaveClicked() },
-                    imageVector = Icons.Filled.Save,
-                    contentDescription = "Save",
-                    tint = Color.LightGray.copy(alpha = 0.8f)
-                )
+                IconButton(
+                    onClick = {},
+                    enabled = isSaveEnabled
+                ) {
+                    Text(text = "Save", color = Color.DarkGray.copy(0.8f))
+                }
+//                Icon(
+//                    modifier = Modifier
+//                        .width(30.dp)
+//                        .height(30.dp)
+//                        .clickable {
+//                            onSaveClicked()
+//                        },
+//                    imageVector = Icons.Filled.Save,
+//                    contentDescription = "Save",
+//                    tint = Color.DarkGray.copy(alpha = 0.8f)
+//                )
             }
 
         },

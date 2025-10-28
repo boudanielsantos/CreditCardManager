@@ -3,7 +3,6 @@ package com.example.creditcardmanager.screens.add
 import ExpiryDateVisualTransformation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -15,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -29,7 +27,6 @@ import com.example.creditcardmanager.model.CreditCard
 import com.example.creditcardmanager.model.CreditCardState
 import com.example.creditcardmanager.model.CreditCardStatus
 import com.example.creditcardmanager.model.CreditCardType
-import com.example.creditcardmanager.utils.Constants
 
 @Composable
 fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHome: () -> Unit) {
@@ -37,12 +34,25 @@ fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHom
     val creditCardState = remember {
         mutableStateOf(CreditCardState())
     }
+    val isValidState = remember(
+        creditCardState.value.lastFourDigitsState.value,
+        creditCardState.value.cardNameState.value,
+        creditCardState.value.creditLimitState.value,
+        creditCardState.value.expiryDateState.value
+    ) {
+        creditCardState.value.cardNameState.value.isNotEmpty() &&
+                creditCardState.value.lastFourDigitsState.value.isNotEmpty() &&
+                creditCardState.value.creditLimitState.value.isNotEmpty() &&
+                creditCardState.value.expiryDateState.value.isNotEmpty()
+    }
+
 
     Scaffold(topBar = {
         CreditCardManagerAppBar(
             title = "Add new card",
             showHome = false,
             showSave = true,
+            isSaveEnabled = isValidState,
             onSaveClicked = {
                 val creditCard = createCreditCard(creditCardState)
                 viewModel.addCard(creditCard)
@@ -77,11 +87,14 @@ fun AddCardScreenContent(creditCardState: MutableState<CreditCardState>) {
 
     InputField(
         label = "Card Name", isSingleLine = true,
+        isRequired = true,
+        validState = creditCardState.value.cardNameValidState,
         valueState = creditCardState.value.cardNameState,
         imeAction = ImeAction.Next,
     )
 
     InputField(
+        isRequired = false,
         label = "Card Description", isSingleLine = false,
         valueState = creditCardState.value.cardDescriptionState,
         imeAction = ImeAction.Next,
@@ -104,6 +117,8 @@ fun AddCardScreenContent(creditCardState: MutableState<CreditCardState>) {
     )
 
     InputField(
+        isRequired = true,
+        validState = creditCardState.value.lastFourDigitsValidState,
         label = "Last 4 Digits of Card Number", isSingleLine = false,
         valueState = creditCardState.value.lastFourDigitsState,
         imeAction = ImeAction.Next,
@@ -115,9 +130,13 @@ fun AddCardScreenContent(creditCardState: MutableState<CreditCardState>) {
         label = "Credit Limit", isSingleLine = false,
         valueState = creditCardState.value.creditLimitState,
         imeAction = ImeAction.Next,
-        keyboardType = KeyboardType.Number
+        keyboardType = KeyboardType.Number,
+        isRequired = true,
+        validState = creditCardState.value.creditLimitValidState
     )
     InputField(
+        isRequired = true,
+        validState = creditCardState.value.expiryDateValidState,
         valueState = creditCardState.value.expiryDateState,
         label = "Expiry Date (MM/YY)",
         keyboardType = KeyboardType.Number,
