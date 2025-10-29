@@ -13,6 +13,8 @@ import com.example.creditcardmanager.screens.add.AddCardScreen
 import com.example.creditcardmanager.screens.add.AddCardViewModel
 import com.example.creditcardmanager.screens.home.HomeScreen
 import com.example.creditcardmanager.screens.home.HomeViewModel
+import com.example.creditcardmanager.screens.settings.SettingsScreen
+import com.example.creditcardmanager.screens.settings.SettingsViewModel
 import com.example.creditcardmanager.screens.splash.SplashScreen
 import com.example.creditcardmanager.screens.update.UpdateScreen
 
@@ -40,6 +42,9 @@ fun CreditCardManagerNavigation() {
                 },
                 onNavigateToUpdateCard = { cardId ->
                     navController.navigate("${CreditCardScreens.UPDATE_CARD_SCREEN.name}/$cardId")
+                },
+                onNavigateToSettings = {
+                    navController.navigate(CreditCardScreens.SETTINGS_SCREEN.name)
                 }
             )
         }
@@ -66,6 +71,16 @@ fun CreditCardManagerNavigation() {
             cardId?.let {
                 UpdateScreen(it)
             }
+        }
+        composable(
+            route = CreditCardScreens.SETTINGS_SCREEN.name
+        ) {
+            val settingsViewModel = hiltViewModel<SettingsViewModel>()
+            SettingsScreen(
+                settingsViewModel,
+                onNavigateBackToHome = {
+                    navController.navigate(CreditCardScreens.HOME_SCREEN.name)
+                })
         }
     }
 }

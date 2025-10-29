@@ -111,4 +111,7 @@ dependencies {
 
     // optional - Test helpers
     testImplementation("androidx.room:room-testing:$room_version")
+
+    //Jetpack Compose Icons
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 }

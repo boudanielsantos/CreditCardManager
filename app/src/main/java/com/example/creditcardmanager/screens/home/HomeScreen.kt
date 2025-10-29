@@ -57,10 +57,16 @@ import com.example.creditcardmanager.utils.Utils
 fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToAddCard: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     onNavigateToUpdateCard: (Int) -> Unit
 ) {
     Scaffold(topBar = {
-        CreditCardManagerAppBar(title = "Credit Card Manager", showHome = true, icon = null)
+        CreditCardManagerAppBar(
+            title = "Credit Card Manager",
+            showHome = true,
+            icon = null,
+            onNavigateToSettings = onNavigateToSettings
+        )
     }, floatingActionButton = {
         FABContent { onNavigateToAddCard() }
     }) { innerPadding ->

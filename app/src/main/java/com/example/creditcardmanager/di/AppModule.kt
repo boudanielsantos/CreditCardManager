@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.example.creditcardmanager.CreditCardManagerDatabase
 import com.example.creditcardmanager.data.CreditCardDao
+import com.example.creditcardmanager.data.SettingsDao
 import com.example.creditcardmanager.repository.CreditCardRepository
+import com.example.creditcardmanager.repository.SettingsRepository
 
 import dagger.Module
 import dagger.Provides
@@ -36,6 +38,17 @@ class AppModule {
     @Singleton
     fun provideCreditCardRepository(creditCardDao: CreditCardDao) =
         CreditCardRepository(creditCardDao)
+
+
+    @Provides
+    @Singleton
+    fun provideSettingsDao(creditCardAppDatabase: CreditCardManagerDatabase) =
+        creditCardAppDatabase.settingsDao()
+
+    @Provides
+    @Singleton
+    fun provideSettingsRepository(settingsDao: SettingsDao) =
+        SettingsRepository(settingsDao)
 }
 
 

@@ -33,6 +33,7 @@ class HomeViewModel @Inject constructor(private val cardRepository: CreditCardRe
     init {
         viewModelScope.launch {
             try {
+                _creditCards.value.loading = true
                 cardRepository.getAllCreditCards().distinctUntilChanged()
                     .collect { cardListFromDb ->
                         if (cardListFromDb.isNotEmpty()) {
@@ -40,28 +41,18 @@ class HomeViewModel @Inject constructor(private val cardRepository: CreditCardRe
                             val processedList = cardListFromDb.map { card ->
                                 val updatedCard = Utils.updateCreditCardCycle(card)
 
-                                // If the cycle logic created a new object, it means an update occurred.
-                                // Persist this change back to the database.
-                                if (updatedCard !== card) { // Use reference check for efficiency
+                                //If a new cycle is started update the card
+                                if (updatedCard !== card) {
                                     updateCreditCard(updatedCard)
                                 }
-                                updatedCard // Return the updated (or original) card to the list
+                                updatedCard
                             }
-
-                            // Update the UI state with the processed list
                             _creditCards.value = _creditCards.value.copy(
                                 data = processedList,
                                 loading = false,
-                                exception = null // Use null for no exception
-                            )
-
-                        } else {
-                            // Handle the case where the list is empty
-                            _creditCards.value = _creditCards.value.copy(
-                                data = emptyList(),
-                                loading = false,
                                 exception = null
                             )
+
                         }
                     }
             } catch (e: Exception) {

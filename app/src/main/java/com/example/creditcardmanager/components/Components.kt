@@ -3,6 +3,7 @@ package com.example.creditcardmanager.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -144,6 +146,7 @@ fun CreditCardManagerAppBar(
     onSaveClicked: () -> Unit = {},
     showSave: Boolean = false,
     isSaveEnabled: Boolean = false,
+    onNavigateToSettings: () -> Unit = {},
     onBackArrowClicked: () -> Unit = {},
 
     ) {
@@ -188,7 +191,10 @@ fun CreditCardManagerAppBar(
                     ) {
                         DropdownMenuItem(
                             text = { Text("Settings") },
-                            onClick = { /* Handle settings click */ showMenu.value = false }
+                            onClick = {
+                                showMenu.value = false
+                                onNavigateToSettings()
+                            }
                         )
                         DropdownMenuItem(
                             text = { Text("About") },
@@ -305,6 +311,33 @@ fun ShowAlertDialog(
             confirmButton = {
                 TextButton(onClick = onYesPressed) { Text("Yes") }
             })
+    }
+
+}
+
+@Composable
+fun InputSwitch(
+    label: String, checkedState: MutableState<Boolean>,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            fontSize = 15.sp
+        )
+        Switch(
+            checked = checkedState.value,
+            onCheckedChange = {
+                onCheckedChange(it)
+            }
+        )
     }
 
 }
