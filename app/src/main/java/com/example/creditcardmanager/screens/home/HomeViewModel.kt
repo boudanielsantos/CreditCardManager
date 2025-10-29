@@ -1,10 +1,13 @@
 package com.example.creditcardmanager.screens.home
 
+import android.icu.util.Calendar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.creditcardmanager.data.DataOrException
 import com.example.creditcardmanager.model.CreditCard
+import com.example.creditcardmanager.model.CreditCardStatus
 import com.example.creditcardmanager.repository.CreditCardRepository
+import com.example.creditcardmanager.utils.Utils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,22 +33,41 @@ class HomeViewModel @Inject constructor(private val cardRepository: CreditCardRe
     init {
         viewModelScope.launch {
             try {
-                cardRepository.getAllCreditCards().distinctUntilChanged().collect { cardList ->
-                    _creditCards.value = _creditCards.value.copy(
-                        data = cardList,
-                        loading = false,
-                        Exception("")
-                    )
-                }
+                cardRepository.getAllCreditCards().distinctUntilChanged()
+                    .collect { cardListFromDb ->
+                        if (cardListFromDb.isNotEmpty()) {
+                            // Process the list to check for cycle updates
+                            val processedList = cardListFromDb.map { card ->
+                                val updatedCard = Utils.updateCreditCardCycle(card)
+
+                                // If the cycle logic created a new object, it means an update occurred.
+                                // Persist this change back to the database.
+                                if (updatedCard !== card) { // Use reference check for efficiency
+                                    updateCreditCard(updatedCard)
+                                }
+                                updatedCard // Return the updated (or original) card to the list
+                            }
+
+                            // Update the UI state with the processed list
+                            _creditCards.value = _creditCards.value.copy(
+                                data = processedList,
+                                loading = false,
+                                exception = null // Use null for no exception
+                            )
+
+                        } else {
+                            // Handle the case where the list is empty
+                            _creditCards.value = _creditCards.value.copy(
+                                data = emptyList(),
+                                loading = false,
+                                exception = null
+                            )
+                        }
+                    }
             } catch (e: Exception) {
-                _creditCards.value.exception = e
-                _creditCards.value.loading = true
-
-
+                _creditCards.value = _creditCards.value.copy(loading = false, exception = e)
             }
-
         }
-
     }
 
     fun updateCreditCard(creditCard: CreditCard) =
@@ -57,4 +79,7 @@ class HomeViewModel @Inject constructor(private val cardRepository: CreditCardRe
 
     fun deleteAllCreditCard() =
         viewModelScope.launch { cardRepository.deleteAllCreditCards() }
+
+
 }
+

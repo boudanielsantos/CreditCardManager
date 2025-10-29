@@ -27,6 +27,7 @@ import com.example.creditcardmanager.model.CreditCard
 import com.example.creditcardmanager.model.CreditCardState
 import com.example.creditcardmanager.model.CreditCardStatus
 import com.example.creditcardmanager.model.CreditCardType
+import java.util.Date
 
 @Composable
 fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHome: () -> Unit) {
@@ -46,6 +47,7 @@ fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHom
                 creditCardState.value.expiryDateState.value.isNotEmpty()
     }
 
+    println("TESTVALID $isValidState")
 
     Scaffold(topBar = {
         CreditCardManagerAppBar(
@@ -162,6 +164,7 @@ private fun createCreditCard(creditCardState: MutableState<CreditCardState>): Cr
         dueDay = creditCardState.value.dueDateState.value.toInt(),
         statementDay = creditCardState.value.statementDateState.value.toInt(),
         cardType = CreditCardType.getCardType(creditCardState.value.cardTypeState.value),
-        cardStatus = CreditCardStatus.UNPAID
+        cardStatus = CreditCardStatus.UNPAID,
+        lastUpdateDate = Date()
     )
 }

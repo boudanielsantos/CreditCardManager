@@ -200,22 +200,14 @@ fun CreditCardManagerAppBar(
             }
             if (showSave) {
                 IconButton(
-                    onClick = {},
+                    onClick = {
+                        onSaveClicked()
+                    },
                     enabled = isSaveEnabled
                 ) {
                     Text(text = "Save", color = Color.DarkGray.copy(0.8f))
                 }
-//                Icon(
-//                    modifier = Modifier
-//                        .width(30.dp)
-//                        .height(30.dp)
-//                        .clickable {
-//                            onSaveClicked()
-//                        },
-//                    imageVector = Icons.Filled.Save,
-//                    contentDescription = "Save",
-//                    tint = Color.DarkGray.copy(alpha = 0.8f)
-//                )
+
             }
 
         },

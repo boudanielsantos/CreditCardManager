@@ -40,7 +40,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -53,8 +52,6 @@ import com.example.creditcardmanager.model.CreditCard
 import com.example.creditcardmanager.model.CreditCardStatus
 import com.example.creditcardmanager.model.CreditCardType
 import com.example.creditcardmanager.utils.Utils
-import java.util.Calendar
-import java.util.Date
 
 @Composable
 fun HomeScreen(
@@ -94,7 +91,7 @@ fun HomeContent(
     ) {
         if (cardList.isNullOrEmpty()) {
 
-            Box (modifier = Modifier.fillMaxSize(),contentAlignment = Alignment.Center){
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
                     "No Credit Cards Added",
                     color = Color.LightGray.copy(0.8f)
@@ -228,7 +225,6 @@ fun ShowUpdateAndDeleteMenu(
 
 @Composable
 fun CardSummary(card: CreditCard) {
-    val currentMonth = Calendar.MONTH
     Column(modifier = Modifier.padding(10.dp)) {
         Text(
             text = card.cardName,
@@ -244,7 +240,7 @@ fun CardSummary(card: CreditCard) {
                 append(text = "Statement Date: ")
             }
             withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                append("${Utils.getCurrentMonth()} ${card.statementDay}")
+                append("${Utils.getStatementDateMonth(card.statementDay)} ${card.statementDay}")
             }
         })
         Text(modifier = Modifier.padding(bottom = 5.dp), text = buildAnnotatedString {
@@ -252,7 +248,7 @@ fun CardSummary(card: CreditCard) {
                 append(text = "Due Date: ")
             }
             withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                append("${Utils.getCurrentMonth()} ${card.dueDay}")
+                append("${Utils.getDueDateMonth(card.dueDay, card.statementDay)} ${card.dueDay}")
             }
         })
 
