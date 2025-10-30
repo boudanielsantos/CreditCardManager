@@ -60,21 +60,35 @@ fun HomeScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToUpdateCard: (Int) -> Unit
 ) {
+    val openDialogDeleteAllState = remember {
+        mutableStateOf(false)
+    }
     Scaffold(topBar = {
         CreditCardManagerAppBar(
             title = "Credit Card Manager",
             showHome = true,
             icon = null,
-            onNavigateToSettings = onNavigateToSettings
+            onNavigateToSettings = onNavigateToSettings,
+            onDeleteAll = {
+                openDialogDeleteAllState.value = true
+            }
         )
     }, floatingActionButton = {
         FABContent { onNavigateToAddCard() }
     }) { innerPadding ->
-        val cardList = viewModel.creditCards.collectAsState().value.data
+        if (openDialogDeleteAllState.value) {
+            ShowAlertDialog(
+                title = stringResource(R.string.delete_dialog_title_all_card),
+                message = stringResource(R.string.delete_dialog_message_all),
+                openDialog = openDialogDeleteAllState
+            ) {
+                viewModel.deleteAllCreditCard()
+                openDialogDeleteAllState.value = false
+            }
+        }
 
         HomeContent(
             innerPadding,
-            cardList,
             viewModel = viewModel,
             onNavigateToUpdateCard = onNavigateToUpdateCard
         )
@@ -84,7 +98,6 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     paddingValues: PaddingValues,
-    cardList: List<CreditCard>? = emptyList(),
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToUpdateCard: (Int) -> Unit
 ) {
@@ -95,6 +108,8 @@ fun HomeContent(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val cardList = viewModel.creditCards.collectAsState().value.data
+
         if (cardList.isNullOrEmpty()) {
 
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

@@ -53,6 +53,11 @@ class HomeViewModel @Inject constructor(private val cardRepository: CreditCardRe
                                 exception = null
                             )
 
+                        } else {
+                            _creditCards.value = _creditCards.value.copy(
+                                data = emptyList(),
+                                loading = false
+                            )
                         }
                     }
             } catch (e: Exception) {
@@ -69,7 +74,9 @@ class HomeViewModel @Inject constructor(private val cardRepository: CreditCardRe
         viewModelScope.launch { cardRepository.deleteCreditCard(creditCard) }
 
     fun deleteAllCreditCard() =
-        viewModelScope.launch { cardRepository.deleteAllCreditCards() }
+        viewModelScope.launch {
+            cardRepository.deleteAllCreditCards()
+        }
 
 
 }

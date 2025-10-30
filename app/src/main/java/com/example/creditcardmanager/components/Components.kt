@@ -147,6 +147,7 @@ fun CreditCardManagerAppBar(
     showSave: Boolean = false,
     isSaveEnabled: Boolean = false,
     onNavigateToSettings: () -> Unit = {},
+    onDeleteAll: () -> Unit = {},
     onBackArrowClicked: () -> Unit = {},
 
     ) {
@@ -197,10 +198,12 @@ fun CreditCardManagerAppBar(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("About") },
-                            onClick = { /* Handle about click */ showMenu.value = false }
+                            text = { Text("Delete All") },
+                            onClick = {
+                                showMenu.value = false
+                                onDeleteAll()
+                            }
                         )
-                        // Add more menu items as needed
                     }
                 }
             }
