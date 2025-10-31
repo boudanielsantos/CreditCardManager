@@ -13,6 +13,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Provider
 
 import javax.inject.Singleton
 
@@ -22,11 +23,15 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): CreditCardManagerDatabase =
+    fun provideAppDatabase(
+        @ApplicationContext context: Context,
+        settingsDaoProvider: Provider<SettingsDao>
+    ): CreditCardManagerDatabase =
         Room.databaseBuilder(
             context,
             CreditCardManagerDatabase::class.java, "credit_card_database"
         ).fallbackToDestructiveMigration(true)
+            .addCallback(CreditCardManagerDatabase.DatabaseCallback(settingsDaoProvider))
             .build()
 
     @Provides

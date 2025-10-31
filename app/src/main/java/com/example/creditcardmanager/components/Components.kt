@@ -1,5 +1,6 @@
 package com.example.creditcardmanager.components
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -51,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -338,10 +340,16 @@ fun InputSwitch(
         Switch(
             checked = checkedState.value,
             onCheckedChange = {
+                checkedState.value = it
                 onCheckedChange(it)
             }
         )
     }
 
+}
+
+@Composable
+fun ShowToast(showState: MutableState<Boolean>, message: String, length: Int) {
+    Toast.makeText(LocalContext.current, message, length).show()
 }
 
