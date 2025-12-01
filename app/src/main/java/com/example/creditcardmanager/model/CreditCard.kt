@@ -9,7 +9,7 @@ data class CreditCard(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
     var cardName: String,
     var description: String?,
-    var creditLimit: Double,
+    var creditLimit: Double?,
     var lastFourDigits: String,
     var expiryDate: String,
     var dueDay: Int,

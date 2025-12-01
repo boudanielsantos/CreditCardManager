@@ -1,6 +1,7 @@
 package com.example.creditcardmanager.screens.home
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -51,6 +53,9 @@ import com.example.creditcardmanager.components.ShowAlertDialog
 import com.example.creditcardmanager.model.CreditCard
 import com.example.creditcardmanager.model.CreditCardStatus
 import com.example.creditcardmanager.model.CreditCardType
+import com.example.creditcardmanager.ui.theme.BurnOrange
+import com.example.creditcardmanager.ui.theme.FloralWhite
+import com.example.creditcardmanager.ui.theme.Gold
 import com.example.creditcardmanager.utils.Utils
 
 @Composable
@@ -63,7 +68,7 @@ fun HomeScreen(
     val openDialogDeleteAllState = remember {
         mutableStateOf(false)
     }
-    Scaffold(topBar = {
+    Scaffold(modifier = Modifier.background(Color.Black), topBar = {
         CreditCardManagerAppBar(
             title = "Credit Card Manager",
             showHome = true,
@@ -87,11 +92,14 @@ fun HomeScreen(
             }
         }
 
-        HomeContent(
-            innerPadding,
-            viewModel = viewModel,
-            onNavigateToUpdateCard = onNavigateToUpdateCard
-        )
+        Surface(color = Color(0xFF1F1616)) {
+            HomeContent(
+                innerPadding,
+                viewModel = viewModel,
+                onNavigateToUpdateCard = onNavigateToUpdateCard
+            )
+        }
+
     }
 }
 
@@ -184,7 +192,9 @@ fun CardItem(
     ) {
         Column {
             cardIcon.value = CreditCardType.getCardTypeIcon(card.cardType)
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .background(BurnOrange)) {
                 CardLogo(cardIcon.value)
                 Spacer(modifier = Modifier.width(20.dp))
                 CardSummary(card)
@@ -249,6 +259,7 @@ fun CardSummary(card: CreditCard) {
     Column(modifier = Modifier.padding(10.dp)) {
         Text(
             text = card.cardName,
+            color = FloralWhite,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
@@ -259,7 +270,7 @@ fun CardSummary(card: CreditCard) {
         val statementMonth = Utils.getMonthName(card.currentStatementMonth)
         val dueMonth = Utils.getMonthName(card.currentDueMonth)
 
-        Text(modifier = Modifier.padding(bottom = 5.dp), text = buildAnnotatedString {
+        Text(modifier = Modifier.padding(bottom = 5.dp), color =FloralWhite , text = buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
                 append(text = "Statement Date: ")
             }
@@ -267,7 +278,7 @@ fun CardSummary(card: CreditCard) {
                 append("$statementMonth ${card.statementDay}")
             }
         })
-        Text(modifier = Modifier.padding(bottom = 5.dp), text = buildAnnotatedString {
+        Text(modifier = Modifier.padding(bottom = 5.dp), color = FloralWhite, text = buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
                 append(text = "Due Date: ")
             }
@@ -280,8 +291,8 @@ fun CardSummary(card: CreditCard) {
 
         Text(
             text = buildAnnotatedString {
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
-                    append("Status:")
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Light, color = FloralWhite)) {
+                    append("Status:  ")
                 }
                 withStyle(
                     style = SpanStyle(

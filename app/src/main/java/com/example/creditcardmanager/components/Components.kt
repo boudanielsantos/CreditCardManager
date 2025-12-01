@@ -64,51 +64,6 @@ import androidx.compose.ui.unit.sp
 import com.example.creditcardmanager.R
 import com.example.creditcardmanager.ui.theme.LightBlue
 
-
-@Composable
-fun InputField(
-    modifier: Modifier = Modifier,
-    valueState: MutableState<String>,
-    label: String,
-    isRequired: Boolean = false,
-    validState: MutableState<Boolean> = mutableStateOf(true),
-    enabled: Boolean = true,
-    isSingleLine: Boolean = true,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Next,
-    maxCharacter: Int = 99,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    onAction: KeyboardActions = KeyboardActions.Default,
-    onValueChange: (String) -> Unit = { valueState.value = it }
-) {
-
-    OutlinedTextField(
-        value = valueState.value, onValueChange = { newValue ->
-            validState.value = !newValue.isEmpty()
-            if (newValue.length <= maxCharacter) {
-                onValueChange(newValue)
-            }
-        },
-        isError = !validState.value,
-        supportingText = {
-            if (isRequired && !validState.value) {
-                Text(text = "This field is required")
-            }
-        },
-        label = { Text(text = label) },
-        singleLine = isSingleLine,
-        modifier = modifier
-            .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
-            .fillMaxWidth(),
-        textStyle = TextStyle(fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground),
-        enabled = enabled,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
-        keyboardActions = onAction,
-        visualTransformation = visualTransformation
-    )
-
-}
-
 //Used in Splash Screen
 @Composable
 fun CreditCardManagerLogo() {
@@ -133,9 +88,9 @@ fun FABContent(onTap: () -> Unit) {
     FloatingActionButton(
         onClick = { onTap() },
         shape = RoundedCornerShape(50.dp),
-        containerColor = Color.White
+        containerColor = Color.LightGray
     ) {
-        Icon(imageVector = Icons.Default.Add, contentDescription = "Add", tint = LightBlue)
+        Icon(imageVector = Icons.Default.Add, contentDescription = "Add", tint = Color.Gray)
     }
 }
 
@@ -174,7 +129,7 @@ fun CreditCardManagerAppBar(
                 Spacer(modifier = Modifier.width(40.dp))
                 Text(
                     text = title,
-                    color = Color.Blue.copy(0.5f),
+                    color = Color.White.copy(0.5f),
                     style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 )
                 Spacer(modifier = Modifier.width(160.dp))
@@ -243,9 +198,61 @@ fun CardLogo(cardIcon: Int) {
     }
 }
 
+
+@Composable
+fun InputField(
+    modifier: Modifier = Modifier,
+    valueState: MutableState<String>,
+    label: String,
+    isRequired: Boolean = false,
+    validState: MutableState<Boolean> = mutableStateOf(true),
+    enabled: Boolean = true,
+    isSingleLine: Boolean = true,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Next,
+    maxCharacter: Int = 99,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    onAction: KeyboardActions = KeyboardActions.Default,
+    onValueChange: (String) -> Unit = { valueState.value = it }
+) {
+
+    OutlinedTextField(
+        value = valueState.value,
+        onValueChange = { newValue ->
+            validState.value = !newValue.isEmpty()
+            if (newValue.length <= maxCharacter) {
+                onValueChange(newValue)
+            }
+        },
+        isError = !validState.value,
+        supportingText = {
+            if (isRequired && !validState.value) {
+                Text(text = "This field is required")
+            }
+        },
+        label = { Text(text = label) },
+        singleLine = isSingleLine,
+        modifier = modifier
+            .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
+            .fillMaxWidth(),
+        textStyle = TextStyle(fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground),
+        enabled = enabled,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
+        keyboardActions = onAction,
+        visualTransformation = visualTransformation
+    )
+
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownField(label: String, options: List<String>, selectedValue: MutableState<String>) {
+fun DropdownField(
+    label: String,
+    options: List<String>,
+    selectedValue: MutableState<String>,
+    isRequired: Boolean = false,
+    validState: MutableState<Boolean> = mutableStateOf(true)
+) {
     var expanded by remember { mutableStateOf(false) }
 
     // Filter options based on the input text
@@ -253,14 +260,21 @@ fun DropdownField(label: String, options: List<String>, selectedValue: MutableSt
         it.contains(selectedValue.value, ignoreCase = true)
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column {
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded }
         ) {
             OutlinedTextField(
+                supportingText = {
+                    if (isRequired && !validState.value) {
+                        Text("This field is required")
+                    }
+                },
+                isError = !validState.value,
                 value = selectedValue.value,
                 onValueChange = { newValue ->
+                    validState.value = !newValue.isEmpty()
                     selectedValue.value = newValue
                     expanded = true
                 },
@@ -271,6 +285,7 @@ fun DropdownField(label: String, options: List<String>, selectedValue: MutableSt
                 modifier = Modifier
                     .menuAnchor() // Important for anchoring the dropdown
                     .fillMaxWidth()
+                    .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
             )
 
             ExposedDropdownMenu(

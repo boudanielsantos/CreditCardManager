@@ -40,15 +40,18 @@ fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHom
         creditCardState.value.lastFourDigitsState.value,
         creditCardState.value.cardNameState.value,
         creditCardState.value.creditLimitState.value,
-        creditCardState.value.expiryDateState.value
+        creditCardState.value.expiryDateState.value,
+        creditCardState.value.cardTypeState.value,
+        creditCardState.value.statementDateState.value,
+        creditCardState.value.dueDateState.value
     ) {
         creditCardState.value.cardNameState.value.isNotEmpty() &&
                 creditCardState.value.lastFourDigitsState.value.isNotEmpty() &&
-                creditCardState.value.creditLimitState.value.isNotEmpty() &&
                 creditCardState.value.expiryDateState.value.isNotEmpty()
+                && creditCardState.value.cardTypeState.value.isNotEmpty() &&
+                creditCardState.value.statementDateState.value.isNotEmpty() && creditCardState.value.dueDateState.value.isNotEmpty()
     }
 
-    println("TESTVALID $isValidState")
 
     Scaffold(topBar = {
         CreditCardManagerAppBar(
@@ -105,18 +108,24 @@ fun AddCardScreenContent(creditCardState: MutableState<CreditCardState>) {
     DropdownField(
         label = "Card Type",
         selectedValue = creditCardState.value.cardTypeState,
-        options = CreditCardType.cardTypeNames
+        options = CreditCardType.cardTypeNames,
+        isRequired = true,
+        validState = creditCardState.value.cardTypeValidState
     )
 
     DropdownField(
         label = "Statement Date",
         selectedValue = creditCardState.value.statementDateState,
-        options = daysInMonth
+        options = daysInMonth,
+        isRequired = true,
+        validState = creditCardState.value.statementDateValidState
     )
     DropdownField(
         label = "Due Date",
         selectedValue = creditCardState.value.dueDateState,
-        options = daysInMonth
+        options = daysInMonth,
+        isRequired = true,
+        validState = creditCardState.value.dueDateValidState
     )
 
     InputField(
@@ -133,9 +142,7 @@ fun AddCardScreenContent(creditCardState: MutableState<CreditCardState>) {
         label = "Credit Limit", isSingleLine = false,
         valueState = creditCardState.value.creditLimitState,
         imeAction = ImeAction.Next,
-        keyboardType = KeyboardType.Number,
-        isRequired = true,
-        validState = creditCardState.value.creditLimitValidState
+        keyboardType = KeyboardType.Number
     )
     InputField(
         isRequired = true,
@@ -172,7 +179,7 @@ private fun createCreditCard(creditCardState: MutableState<CreditCardState>): Cr
     return CreditCard(
         cardName = creditCardState.value.cardNameState.value,
         description = creditCardState.value.cardDescriptionState.value,
-        creditLimit = creditCardState.value.creditLimitState.value.toDouble(),
+        creditLimit = if (creditCardState.value.creditLimitState.value != "") creditCardState.value.creditLimitState.value.toDouble() else null,
         lastFourDigits = creditCardState.value.lastFourDigitsState.value,
         expiryDate = creditCardState.value.expiryDateState.value,
         dueDay = creditCardState.value.dueDateState.value.toInt(),
