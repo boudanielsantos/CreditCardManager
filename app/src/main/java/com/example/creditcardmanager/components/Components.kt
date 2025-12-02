@@ -271,9 +271,9 @@ fun DropdownField(
                         Text("This field is required")
                     }
                 },
-                isError = !validState.value,
                 value = selectedValue.value,
                 onValueChange = { newValue ->
+
                     validState.value = !newValue.isEmpty()
                     selectedValue.value = newValue
                     expanded = true
@@ -303,6 +303,7 @@ fun DropdownField(
                         DropdownMenuItem(
                             text = { Text(option) },
                             onClick = {
+                                validState.value = !option.isEmpty()
                                 selectedValue.value = option
                                 expanded = false
                             }
