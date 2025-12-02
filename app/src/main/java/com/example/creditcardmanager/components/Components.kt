@@ -318,7 +318,8 @@ fun DropdownField(
 @Composable
 fun ShowAlertDialog(
     title: String,
-    message: String, openDialog: MutableState<Boolean>,
+    message: String,
+    openDialog: MutableState<Boolean>,
     onYesPressed: () -> Unit
 ) {
     if (openDialog.value) {

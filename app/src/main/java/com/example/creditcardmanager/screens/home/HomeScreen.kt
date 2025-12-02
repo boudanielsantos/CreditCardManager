@@ -128,32 +128,34 @@ fun HomeContent(
             }
 
         } else {
-            val openDialog = remember {
-                mutableStateOf(false)
+            val cardToDelete = remember {
+                mutableStateOf<CreditCard?>(null)
             }
+            cardToDelete.value?.let { card ->
+                ShowAlertDialog(
+                    title = stringResource(R.string.delete_dialog_title),
+                    message = stringResource(R.string.delete_dialog_message_single),
+                    openDialog = remember { mutableStateOf(true) }
+                ) {
+                    viewModel.deleteCreditCard(card)
+                    cardToDelete.value = null
+                }
+
+            }
+
             LazyColumn(verticalArrangement = Arrangement.spacedBy(20.dp)) {
                 items(items = cardList) { card ->
                     CardItem(
                         card,
                         onDeleteCardClicked = {
-                            openDialog.value = true
-
+                            cardToDelete.value = card
                         },
                         onMarkAsSettledClicked = {
                             viewModel.updateCreditCard(card.copy(cardStatus = CreditCardStatus.SETTLED))
                         },
                         onNavigateToUpdateCard = onNavigateToUpdateCard
                     )
-                    if (openDialog.value) {
-                        ShowAlertDialog(
-                            title = stringResource(R.string.delete_dialog_title),
-                            message = stringResource(R.string.delete_dialog_message_single),
-                            openDialog = openDialog
-                        ) {
-                            viewModel.deleteCreditCard(card)
-                            openDialog.value = false
-                        }
-                    }
+
                 }
             }
         }
@@ -192,9 +194,10 @@ fun CardItem(
     ) {
         Column {
             cardIcon.value = CreditCardType.getCardTypeIcon(card.cardType)
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .background(BurnOrange)) {
+            Row(
+                modifier = Modifier
+                    .background(BurnOrange)
+            ) {
                 CardLogo(cardIcon.value)
                 Spacer(modifier = Modifier.width(20.dp))
                 CardSummary(card)
@@ -222,10 +225,13 @@ fun ShowUpdateAndDeleteMenu(
         IconButton(
             onClick = { showMenu.value = true },
             modifier = Modifier
-
                 .padding(8.dp)
         ) {
-            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More")
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "More",
+                tint = Color.Green
+            )
         }
 
         DropdownMenu(
@@ -270,22 +276,28 @@ fun CardSummary(card: CreditCard) {
         val statementMonth = Utils.getMonthName(card.currentStatementMonth)
         val dueMonth = Utils.getMonthName(card.currentDueMonth)
 
-        Text(modifier = Modifier.padding(bottom = 5.dp), color =FloralWhite , text = buildAnnotatedString {
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
-                append(text = "Statement Date: ")
-            }
-            withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                append("$statementMonth ${card.statementDay}")
-            }
-        })
-        Text(modifier = Modifier.padding(bottom = 5.dp), color = FloralWhite, text = buildAnnotatedString {
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
-                append(text = "Due Date: ")
-            }
-            withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                append("$dueMonth ${card.dueDay}")
-            }
-        })
+        Text(
+            modifier = Modifier.padding(bottom = 5.dp),
+            color = FloralWhite,
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
+                    append(text = "Statement Date: ")
+                }
+                withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                    append("$statementMonth ${card.statementDay}")
+                }
+            })
+        Text(
+            modifier = Modifier.padding(bottom = 5.dp),
+            color = FloralWhite,
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
+                    append(text = "Due Date: ")
+                }
+                withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                    append("$dueMonth ${card.dueDay}")
+                }
+            })
 
 
 
