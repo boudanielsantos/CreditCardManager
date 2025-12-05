@@ -35,9 +35,9 @@ enum class CreditCardType {
 
         fun getCardTypeIcon(cardType: CreditCardType): Int =
             when (cardType) {
-                VISA -> R.drawable.visa
+                VISA -> R.drawable.visa_jpg
                 JCB -> R.drawable.jcb
-                MASTER_CARD -> R.drawable.mastercard
+                MASTER_CARD -> R.drawable.mastercard_jpg
                 DISCOVER_CARD -> R.drawable.discover
                 DINERS_CLUB_INTERNATIONAL -> R.drawable.diners_club
                 AMERICAN_EXPRESS -> R.drawable.amex
