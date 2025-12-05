@@ -2,6 +2,7 @@ package com.example.creditcardmanager.screens.add
 
 import ExpiryDateVisualTransformation
 import android.icu.util.Calendar
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +25,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.creditcardmanager.components.CreditCardManagerAppBar
 import com.example.creditcardmanager.components.DropdownField
 import com.example.creditcardmanager.components.InputField
+import com.example.creditcardmanager.components.ShowToast
 import com.example.creditcardmanager.model.CreditCard
 import com.example.creditcardmanager.model.CreditCardState
 import com.example.creditcardmanager.model.CreditCardStatus
@@ -35,6 +37,9 @@ fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHom
 
     val creditCardState = remember {
         mutableStateOf(CreditCardState())
+    }
+    val showState = remember {
+        mutableStateOf(false)
     }
     val isValidState = remember(
         creditCardState.value.lastFourDigitsState.value,
@@ -60,6 +65,7 @@ fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHom
             showSave = true,
             isSaveEnabled = isValidState,
             onSaveClicked = {
+                showState.value = true
                 val creditCard = createCreditCard(creditCardState)
                 viewModel.addCard(creditCard)
                 onNavigateToHome()
@@ -82,6 +88,9 @@ fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHom
         ) {
             AddCardScreenContent(creditCardState)
         }
+    }
+    if (showState.value) {
+        ShowToast(showState, "Card Added Successfully", Toast.LENGTH_SHORT)
     }
 }
 
@@ -174,7 +183,7 @@ private fun createCreditCard(creditCardState: MutableState<CreditCardState>): Cr
 
     if (dueDay >= statementDay) {
         if (currentDayOfMonth < statementDay) {
-            statementCal.add(Calendar.MONTH, -1) 
+            statementCal.add(Calendar.MONTH, -1)
             dueCal.add(Calendar.MONTH, -1)
         }
     } else {

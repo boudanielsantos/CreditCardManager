@@ -52,4 +52,8 @@ class UpdateCardViewModel @Inject constructor(
         }
 
     }
+
+    fun updateCard(creditCard: CreditCard) {
+        viewModelScope.launch { cardRepository.updateCreditCard(creditCard) }
+    }
 }

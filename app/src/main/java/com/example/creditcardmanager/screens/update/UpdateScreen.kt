@@ -1,5 +1,6 @@
 package com.example.creditcardmanager.screens.update
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,6 +28,7 @@ import com.example.creditcardmanager.components.CardLogo
 import com.example.creditcardmanager.components.CreditCardManagerAppBar
 import com.example.creditcardmanager.components.CreditCardManagerLogo
 import com.example.creditcardmanager.components.InputField
+import com.example.creditcardmanager.components.ShowToast
 import com.example.creditcardmanager.model.CreditCard
 import com.example.creditcardmanager.model.CreditCardType
 
@@ -35,40 +37,79 @@ fun UpdateScreen(
     updateCardViewModel: UpdateCardViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit
 ) {
-
+    val showState = remember {
+        mutableStateOf(false)
+    }
     val cardState = updateCardViewModel.creditCard.collectAsState().value
     val isLoading = cardState.loading
     val creditCard = cardState.data
-    Scaffold(
-        topBar = {
-            CreditCardManagerAppBar(
-                title = "Update ${creditCard?.cardName}",
-                showHome = false,
-                showSave = true,
-//                isSaveEnabled = isValidState,
-//                onSaveClicked = {
-//                    val creditCard = createCreditCard(creditCardState)
-//                    viewModel.addCard(creditCard)
-//                    onNavigateToHome()
-//                },
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
-            ) {
-                onNavigateToHome()
-            }
+    if (isLoading) {
+        CircularProgressIndicator()
+    } else {
+        val cardDescriptionValue = remember {
+            mutableStateOf(creditCard?.description ?: "")
         }
-    ) { innerPadding ->
-        if (isLoading) {
-            CircularProgressIndicator()
-        } else {
-            if (creditCard != null) {
-                CardDetails(creditCard, innerPadding)
+
+        val cardCreditLimitValue = remember {
+            val limit = creditCard?.creditLimit
+            val formattedLimit = if (limit != null) {
+                if (limit % 1.0 == 0.0) {
+                    limit.toInt().toString()
+                } else {
+                    limit.toString()
+                }
+            } else {
+                ""
             }
+            mutableStateOf(formattedLimit)
+        }
+
+        val isValidState = remember(cardDescriptionValue.value, cardCreditLimitValue.value) {
+            cardDescriptionValue.value.isNotEmpty() && cardCreditLimitValue.value.isNotEmpty()
+        }
+        Scaffold(
+            topBar = {
+                CreditCardManagerAppBar(
+                    title = "Update ${creditCard?.cardName}",
+                    showHome = false,
+                    showSave = true,
+                    isSaveEnabled = isValidState,
+                    onSaveClicked = {
+                        showState.value = true
+                        updateCardViewModel.updateCard(
+                            creditCard!!.copy(
+                                description = cardDescriptionValue.value,
+                                creditLimit = cardCreditLimitValue.value.toDouble()
+                            )
+                        )
+                        onNavigateToHome()
+                    },
+                    icon = Icons.AutoMirrored.Filled.ArrowBack,
+                ) {
+                    onNavigateToHome()
+                }
+            }
+        ) { innerPadding ->
+            if (creditCard != null) {
+                CardDetails(creditCard, innerPadding, cardDescriptionValue, cardCreditLimitValue)
+            }
+
+        }
+
+        if (showState.value) {
+            ShowToast(showState, "Card Updated Successfully", Toast.LENGTH_SHORT)
         }
     }
+
 }
 
 @Composable
-fun CardDetails(card: CreditCard, innerPadding: PaddingValues, onSaveClicked: () -> Unit = {}) {
+fun CardDetails(
+    card: CreditCard,
+    innerPadding: PaddingValues,
+    cardDescriptionValue: MutableState<String>,
+    cardCreditLimitValue: MutableState<String>
+) {
     Column(
         modifier = Modifier
             .padding(innerPadding)
@@ -77,13 +118,6 @@ fun CardDetails(card: CreditCard, innerPadding: PaddingValues, onSaveClicked: ()
     ) {
         CardLogo(CreditCardType.getCardTypeIcon(card.cardType))
         Text(card.cardName, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
-        val cardDescriptionValue = remember {
-            mutableStateOf(card.description ?: "")
-        }
-
-        val cardCreditLimit = remember {
-            mutableStateOf(if (card.creditLimit.toString() != "null") card.creditLimit.toString() else "")
-        }
 
 
         InputField(
@@ -97,7 +131,7 @@ fun CardDetails(card: CreditCard, innerPadding: PaddingValues, onSaveClicked: ()
         InputField(
             label = "Credit Limit",
             isSingleLine = true,
-            valueState = cardCreditLimit,
+            valueState = cardCreditLimitValue,
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Number
         )
