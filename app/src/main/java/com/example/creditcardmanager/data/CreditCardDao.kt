@@ -33,4 +33,7 @@ interface CreditCardDao {
     @Query("SELECT * FROM credit_card where dueDay =:dayOfMonth")
     fun getCardsByDueDate(dayOfMonth: Int): Flow<List<CreditCard>>
 
+    @Query("SELECT * FROM credit_card where id =:id")
+    fun getCardById(id: Int): Flow<CreditCard>
+
 }

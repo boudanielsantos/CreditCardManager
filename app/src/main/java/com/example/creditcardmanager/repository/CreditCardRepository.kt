@@ -30,4 +30,9 @@ class CreditCardRepository @Inject constructor(val creditCardDao: CreditCardDao)
         return creditCardDao.getCardsByDueDate(dayOfMonth)
     }
 
+    fun getCardById(id: Int): Flow<CreditCard> {
+        return creditCardDao.getCardById(id)
+
+    }
+
 }

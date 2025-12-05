@@ -63,7 +63,7 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToAddCard: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onNavigateToUpdateCard: (Int) -> Unit
+    onNavigateToUpdateCard: (Int, String) -> Unit
 ) {
     val openDialogDeleteAllState = remember {
         mutableStateOf(false)
@@ -107,7 +107,7 @@ fun HomeScreen(
 fun HomeContent(
     paddingValues: PaddingValues,
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateToUpdateCard: (Int) -> Unit
+    onNavigateToUpdateCard: (Int, String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -171,7 +171,7 @@ fun CardItem(
     card: CreditCard,
     onMarkAsSettledClicked: () -> Unit = {},
     onDeleteCardClicked: () -> Unit = {},
-    onNavigateToUpdateCard: (Int) -> Unit = {}
+    onNavigateToUpdateCard: (Int, String) -> Unit = { _, _ -> }
 ) {
     val cardIcon = remember {
         mutableStateOf(0)
@@ -185,7 +185,7 @@ fun CardItem(
             .fillMaxWidth()
             .padding(start = 20.dp, end = 20.dp)
             .clickable {
-                onNavigateToUpdateCard(card.id!!)
+                onNavigateToUpdateCard(card.id!!, card.cardName)
             },
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -196,7 +196,7 @@ fun CardItem(
             cardIcon.value = CreditCardType.getCardTypeIcon(card.cardType)
             Row(
                 modifier = Modifier
-                    .background(BurnOrange)
+                    .background(Color.DarkGray)
             ) {
                 CardLogo(cardIcon.value)
                 Spacer(modifier = Modifier.width(20.dp))
@@ -230,7 +230,7 @@ fun ShowUpdateAndDeleteMenu(
             Icon(
                 imageVector = Icons.Default.MoreVert,
                 contentDescription = "More",
-                tint = Color.Green
+                tint = Color.White
             )
         }
 

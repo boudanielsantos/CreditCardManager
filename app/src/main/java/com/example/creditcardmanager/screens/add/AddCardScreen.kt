@@ -163,27 +163,40 @@ fun AddCardScreenContent(creditCardState: MutableState<CreditCardState>) {
 
 private fun createCreditCard(creditCardState: MutableState<CreditCardState>): CreditCard {
     val statementDay = creditCardState.value.statementDateState.value.toInt()
-    val calendar = Calendar.getInstance()
-    val currentDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-    val statementMonthCalendar = Calendar.getInstance()
-    if (currentDayOfMonth < statementDay) {
-        statementMonthCalendar.add(Calendar.MONTH, -1)
-    }
-    val currentStatementMonth = statementMonthCalendar.get(Calendar.MONTH) + 1
+    val dueDay = creditCardState.value.dueDateState.value.toInt()
 
-    val dueMonthCalendar = Calendar.getInstance()
-    if (currentDayOfMonth >= statementDay) {
-        dueMonthCalendar.add(Calendar.MONTH, 1)
+    val today = Calendar.getInstance()
+    val currentDayOfMonth = today.get(Calendar.DAY_OF_MONTH)
+
+    val statementCal = Calendar.getInstance()
+    val dueCal = Calendar.getInstance()
+
+
+    if (dueDay >= statementDay) {
+        if (currentDayOfMonth < statementDay) {
+            statementCal.add(Calendar.MONTH, -1) 
+            dueCal.add(Calendar.MONTH, -1)
+        }
+    } else {
+        if (currentDayOfMonth >= statementDay) {
+            dueCal.add(Calendar.MONTH, 1)
+        } else {
+            statementCal.add(Calendar.MONTH, -1)
+        }
     }
-    val currentDueMonth = dueMonthCalendar.get(Calendar.MONTH) + 1
+
+    val currentStatementMonth =
+        statementCal.get(Calendar.MONTH) + 1
+    val currentDueMonth = dueCal.get(Calendar.MONTH) + 1
+
     return CreditCard(
         cardName = creditCardState.value.cardNameState.value,
         description = creditCardState.value.cardDescriptionState.value,
-        creditLimit = if (creditCardState.value.creditLimitState.value != "") creditCardState.value.creditLimitState.value.toDouble() else null,
+        creditLimit = if (creditCardState.value.creditLimitState.value.isNotEmpty()) creditCardState.value.creditLimitState.value.toDouble() else null,
         lastFourDigits = creditCardState.value.lastFourDigitsState.value,
         expiryDate = creditCardState.value.expiryDateState.value,
-        dueDay = creditCardState.value.dueDateState.value.toInt(),
-        statementDay = creditCardState.value.statementDateState.value.toInt(),
+        dueDay = dueDay,
+        statementDay = statementDay,
         cardType = CreditCardType.getCardType(creditCardState.value.cardTypeState.value),
         cardStatus = CreditCardStatus.UNPAID,
         lastUpdateDate = Date(),
