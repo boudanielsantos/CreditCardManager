@@ -169,9 +169,12 @@ fun CreditCardManagerAppBar(
                     onClick = {
                         onSaveClicked()
                     },
-                    enabled = isSaveEnabled
+                    enabled = isSaveEnabled,
                 ) {
-                    Text(text = "Save", color = Color.DarkGray.copy(0.8f))
+                    Text(
+                        text = "Save",
+                        color = if (isSaveEnabled) Color.White else Color.White.copy(0.2f)
+                    )
                 }
 
             }
