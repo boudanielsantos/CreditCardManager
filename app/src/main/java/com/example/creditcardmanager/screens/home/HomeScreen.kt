@@ -92,7 +92,7 @@ fun HomeScreen(
             }
         }
 
-        Surface(color = Color(0xFF1F1616)) {
+        Surface() {
             HomeContent(
                 innerPadding,
                 viewModel = viewModel,
