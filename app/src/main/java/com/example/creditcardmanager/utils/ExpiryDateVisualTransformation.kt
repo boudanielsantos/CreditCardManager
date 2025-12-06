@@ -5,8 +5,16 @@ import androidx.compose.ui.text.input.VisualTransformation
 
 class ExpiryDateVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
-        val trimmed = if (text.text.length >= 4) text.text.substring(0..3) else text.text
+        var trimmed = if (text.text.length >= 4) text.text.substring(0..3) else text.text
         var out = ""
+
+        if (trimmed.isNotEmpty()) {
+            val month = trimmed.take(minOf(2, trimmed.length))
+            if (month.length == 2 && month.toInt() > 12) {
+                trimmed = "0" + month.first() + trimmed.drop(2)
+            }
+        }
+
         for (i in trimmed.indices) {
             out += trimmed[i]
             if (i == 1) out += "/"
