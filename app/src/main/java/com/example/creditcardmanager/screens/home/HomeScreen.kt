@@ -38,7 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
@@ -53,9 +55,7 @@ import com.example.creditcardmanager.components.ShowAlertDialog
 import com.example.creditcardmanager.model.CreditCard
 import com.example.creditcardmanager.model.CreditCardStatus
 import com.example.creditcardmanager.model.CreditCardType
-import com.example.creditcardmanager.ui.theme.BurnOrange
 import com.example.creditcardmanager.ui.theme.FloralWhite
-import com.example.creditcardmanager.ui.theme.Gold
 import com.example.creditcardmanager.utils.Utils
 
 @Composable
@@ -78,6 +78,7 @@ fun HomeScreen(
                 openDialogDeleteAllState.value = true
             }
         )
+
     }, floatingActionButton = {
         FABContent { onNavigateToAddCard() }
     }) { innerPadding ->
@@ -119,7 +120,6 @@ fun HomeContent(
         val cardList = viewModel.creditCards.collectAsState().value.data
 
         if (cardList.isNullOrEmpty()) {
-
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
                     "No Credit Cards Added",
@@ -263,15 +263,36 @@ fun ShowUpdateAndDeleteMenu(
 @Composable
 fun CardSummary(card: CreditCard) {
     Column(modifier = Modifier.padding(10.dp)) {
-        Text(
-            text = card.cardName,
-            color = FloralWhite,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            fontSize = 15.sp,
-            overflow = TextOverflow.Clip
-        )
+
+        Row {
+            Text(
+                text = card.cardName,
+                color = FloralWhite,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                fontSize = 15.sp,
+                overflow = TextOverflow.Clip
+            )
+            Spacer(modifier = Modifier.width(15.dp))
+            Text(
+                text = "(${card.lastFourDigits})",
+                color = FloralWhite,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+        card.description?.let { description ->
+            Text(
+                text = description,
+                color = FloralWhite,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Light,
+                maxLines = 3,
+                fontSize = 10.sp,
+                overflow = TextOverflow.Clip
+            )
+        }
 
         val statementMonth = Utils.getMonthName(card.currentStatementMonth)
         val dueMonth = Utils.getMonthName(card.currentDueMonth)
@@ -287,6 +308,7 @@ fun CardSummary(card: CreditCard) {
                     append("$statementMonth ${card.statementDay}")
                 }
             })
+
         Text(
             modifier = Modifier.padding(bottom = 5.dp),
             color = FloralWhite,
@@ -300,6 +322,32 @@ fun CardSummary(card: CreditCard) {
             })
 
 
+        Text(
+            modifier = Modifier.padding(bottom = 5.dp),
+            color = FloralWhite,
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
+                    append(text = "Expiry Date: ")
+                }
+                withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                    append(Utils.formatMonthYearToUi(card.expiryDate))
+                }
+            })
+
+
+        if (card.creditLimit != null) {
+            Text(
+                modifier = Modifier.padding(bottom = 5.dp),
+                color = FloralWhite,
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
+                        append(text = "Credit Limit: ")
+                    }
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                        append(card.creditLimit.toString())
+                    }
+                })
+        }
 
         Text(
             text = buildAnnotatedString {

@@ -1,6 +1,7 @@
 package com.example.creditcardmanager.screens.add
 
 import ExpiryDateVisualTransformation
+import android.R.attr.text
 import android.icu.util.Calendar
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -57,6 +59,13 @@ fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHom
                 creditCardState.value.statementDateState.value.isNotEmpty() && creditCardState.value.dueDateState.value.isNotEmpty()
     }
 
+    val visualTransformation = ExpiryDateVisualTransformation()
+
+    val transformedExpiryDate =
+        remember(creditCardState.value.expiryDateState.value, visualTransformation) {
+            visualTransformation.filter(AnnotatedString(creditCardState.value.expiryDateState.value))
+        }.text.text
+
 
     Scaffold(topBar = {
         CreditCardManagerAppBar(
@@ -66,7 +75,7 @@ fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHom
             isSaveEnabled = isValidState,
             onSaveClicked = {
                 showState.value = true
-                val creditCard = createCreditCard(creditCardState)
+                val creditCard = createCreditCard(creditCardState, transformedExpiryDate)
                 viewModel.addCard(creditCard)
                 onNavigateToHome()
             },
@@ -86,7 +95,7 @@ fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHom
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
-            AddCardScreenContent(creditCardState)
+            AddCardScreenContent(creditCardState, visualTransformation)
         }
     }
     if (showState.value) {
@@ -95,8 +104,10 @@ fun AddCardScreen(viewModel: AddCardViewModel = hiltViewModel(), onNavigateToHom
 }
 
 @Composable
-fun AddCardScreenContent(creditCardState: MutableState<CreditCardState>) {
-    val keyboardController = LocalSoftwareKeyboardController.current
+fun AddCardScreenContent(
+    creditCardState: MutableState<CreditCardState>,
+    visualTransformation: ExpiryDateVisualTransformation
+) {
 
     val daysInMonth = (1..31).map { it.toString() }
 
@@ -161,16 +172,19 @@ fun AddCardScreenContent(creditCardState: MutableState<CreditCardState>) {
         keyboardType = KeyboardType.Number,
         imeAction = ImeAction.Done,
         maxCharacter = 4, //
-        visualTransformation = ExpiryDateVisualTransformation(),
+        visualTransformation = visualTransformation,
         onValueChange = { newValue ->
-            if (newValue.length <= 4) {
+            if (newValue.length <= 5) {
                 creditCardState.value.expiryDateState.value = newValue.filter { it.isDigit() }
             }
         }
     )
 }
 
-private fun createCreditCard(creditCardState: MutableState<CreditCardState>): CreditCard {
+private fun createCreditCard(
+    creditCardState: MutableState<CreditCardState>,
+    expiryDate: String
+): CreditCard {
     val statementDay = creditCardState.value.statementDateState.value.toInt()
     val dueDay = creditCardState.value.dueDateState.value.toInt()
 
@@ -203,7 +217,7 @@ private fun createCreditCard(creditCardState: MutableState<CreditCardState>): Cr
         description = creditCardState.value.cardDescriptionState.value,
         creditLimit = if (creditCardState.value.creditLimitState.value.isNotEmpty()) creditCardState.value.creditLimitState.value.toDouble() else null,
         lastFourDigits = creditCardState.value.lastFourDigitsState.value,
-        expiryDate = creditCardState.value.expiryDateState.value,
+        expiryDate = expiryDate,
         dueDay = dueDay,
         statementDay = statementDay,
         cardType = CreditCardType.getCardType(creditCardState.value.cardTypeState.value),

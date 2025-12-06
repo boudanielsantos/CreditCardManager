@@ -1,5 +1,6 @@
 package com.example.creditcardmanager.utils
 
+import android.util.Log
 import androidx.compose.animation.core.copy
 import com.example.creditcardmanager.model.CreditCard
 import com.example.creditcardmanager.model.CreditCardStatus
@@ -14,6 +15,19 @@ object Utils {
         val dateFormat = SimpleDateFormat("MMM dd", Locale.getDefault())
         return dateFormat.format(date)
 
+    }
+
+    //Accepts date with the format mm/yy  e.g 06/25 should return June 2025
+    fun formatMonthYearToUi(date: String): String {
+        val inputFormat = SimpleDateFormat("MM/yy", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+        return try {
+            val parsedDate = inputFormat.parse(date)
+            parsedDate?.let { outputFormat.format(it) } ?: ""
+        } catch (e: Exception) {
+            Log.e("Utils", "Error encountered parsing the date $date")
+            ""
+        }
     }
 
     fun getMonthName(monthIndex: Int?): String {
@@ -90,5 +104,6 @@ object Utils {
         // If no new cycle, return the card as is.
         return card
     }
+
 
 }
