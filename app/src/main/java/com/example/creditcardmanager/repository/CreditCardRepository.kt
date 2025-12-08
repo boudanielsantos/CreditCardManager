@@ -22,4 +22,12 @@ class CreditCardRepository @Inject constructor(val creditCardDao: CreditCardDao)
     suspend fun updateCreditCard(creditCard: CreditCard) =
         creditCardDao.updateCreditCard(creditCard)
 
+    fun getCardsByStatementDate(dayOfMonth: Int): Flow<List<CreditCard>> {
+        return creditCardDao.getCardsByStatementDate(dayOfMonth)
+    }
+
+    fun getCardsByDueDate(dayOfMonth: Int): Flow<List<CreditCard>> {
+        return creditCardDao.getCardsByDueDate(dayOfMonth)
+    }
+
 }

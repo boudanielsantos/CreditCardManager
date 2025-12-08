@@ -1,6 +1,7 @@
 package com.example.creditcardmanager.screens.add
 
 import ExpiryDateVisualTransformation
+import android.icu.util.Calendar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -154,7 +155,20 @@ fun AddCardScreenContent(creditCardState: MutableState<CreditCardState>) {
 }
 
 private fun createCreditCard(creditCardState: MutableState<CreditCardState>): CreditCard {
+    val statementDay = creditCardState.value.statementDateState.value.toInt()
+    val calendar = Calendar.getInstance()
+    val currentDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+    val statementMonthCalendar = Calendar.getInstance()
+    if (currentDayOfMonth < statementDay) {
+        statementMonthCalendar.add(Calendar.MONTH, -1)
+    }
+    val currentStatementMonth = statementMonthCalendar.get(Calendar.MONTH) + 1
 
+    val dueMonthCalendar = Calendar.getInstance()
+    if (currentDayOfMonth >= statementDay) {
+        dueMonthCalendar.add(Calendar.MONTH, 1)
+    }
+    val currentDueMonth = dueMonthCalendar.get(Calendar.MONTH) + 1
     return CreditCard(
         cardName = creditCardState.value.cardNameState.value,
         description = creditCardState.value.cardDescriptionState.value,
@@ -165,6 +179,8 @@ private fun createCreditCard(creditCardState: MutableState<CreditCardState>): Cr
         statementDay = creditCardState.value.statementDateState.value.toInt(),
         cardType = CreditCardType.getCardType(creditCardState.value.cardTypeState.value),
         cardStatus = CreditCardStatus.UNPAID,
-        lastUpdateDate = Date()
+        lastUpdateDate = Date(),
+        currentDueMonth = currentDueMonth,
+        currentStatementMonth = currentStatementMonth
     )
 }

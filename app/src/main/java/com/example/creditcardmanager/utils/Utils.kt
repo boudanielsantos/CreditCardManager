@@ -16,6 +16,14 @@ object Utils {
 
     }
 
+    fun getMonthName(monthIndex: Int?): String {
+        if (monthIndex == null) return ""
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.MONTH, monthIndex)
+        val dateFormat = SimpleDateFormat("MMM", Locale.getDefault())
+        return dateFormat.format(calendar.time)
+    }
+
     fun getStatementDateMonth(day: Int): String {
         val calendar = Calendar.getInstance()
         val currentDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
@@ -50,7 +58,11 @@ object Utils {
     }
 
 
-    fun updateCreditCardCycle(card: CreditCard): CreditCard {
+    fun updateCreditCardCycle(
+        card: CreditCard,
+        statementMonthCalendar: Calendar,
+        dueDateMonthCalendar: Calendar
+    ): CreditCard {
         val today = Calendar.getInstance()
         val lastUpdate = Calendar.getInstance().apply { time = card.lastUpdateDate }
 
@@ -68,8 +80,10 @@ object Utils {
         ) {
             // A new cycle has started, so we need to update the card.
             return card.copy(
-                cardStatus = CreditCardStatus.UNPAID, // Reset status to Unpaid
-                lastUpdateDate = Date() // Update the last update date to now
+                cardStatus = CreditCardStatus.UNPAID,
+                lastUpdateDate = Date(),
+                currentStatementMonth = statementMonthCalendar.get(Calendar.MONTH),
+                currentDueMonth = dueDateMonthCalendar.get(Calendar.MONTH)
             )
         }
 

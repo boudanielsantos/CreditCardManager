@@ -14,7 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Provider
 
-@Database(entities = [CreditCard::class, Settings::class], version = 5, exportSchema = false)
+@Database(entities = [CreditCard::class, Settings::class], version = 6, exportSchema = false)
 @TypeConverters(DateConverter::class)
 abstract class CreditCardManagerDatabase : RoomDatabase() {
 
