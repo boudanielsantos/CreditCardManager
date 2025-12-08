@@ -32,9 +32,11 @@ fun SettingsScreen(
 
 @Composable
 fun SettingsContent(settingsViewModel: SettingsViewModel, onNavigateBackToHome: () -> Unit) {
-    val settingsFromDb = settingsViewModel.settings.collectAsState().value.data
+    val settingsState = settingsViewModel.settings.collectAsState().value
+    val settingsFromDb = settingsState.data
 
-    if (!settingsViewModel.settings.collectAsState().value.loading) {
+    if (!settingsState.loading) {
+
         val sendingOfDueDateNotificationState = remember {
             if (settingsFromDb != null) {
                 mutableStateOf(settingsFromDb.allowSendingOfDueDateNotification)
@@ -55,7 +57,6 @@ fun SettingsContent(settingsViewModel: SettingsViewModel, onNavigateBackToHome: 
 
 
         Scaffold(
-            bottomBar = { Text("TEST") },
             topBar = {
                 CreditCardManagerAppBar(
                     title = "Settings",
