@@ -114,4 +114,11 @@ dependencies {
 
     //Jetpack Compose Icons
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
+
+    //Workers
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    implementation("androidx.hilt:hilt-work:1.3.0")
+    ksp("androidx.hilt:hilt-compiler:1.3.0")
+
 }

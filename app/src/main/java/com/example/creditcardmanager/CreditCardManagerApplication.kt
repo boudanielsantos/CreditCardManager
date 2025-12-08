@@ -3,9 +3,8 @@ package com.example.creditcardmanager
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.creditcardmanager.worker.notification.NotificationWorker
 import dagger.hilt.android.HiltAndroidApp
@@ -30,20 +29,16 @@ class CreditCardManagerApplication : Application(), Configuration.Provider {
     }
 
     private fun setupRecurringWork() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
+        val workManager = WorkManager.getInstance(applicationContext)
+
+        val dailyWorkRequest = PeriodicWorkRequestBuilder<NotificationWorker>(1, TimeUnit.DAYS)
             .build()
 
-        val myWorkRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
-            .setConstraints(constraints)
-            // For periodic work, you would use PeriodicWorkRequestBuilder
-            // For example, run once every 24 hours:
-            // val myWorkRequest = PeriodicWorkRequestBuilder<MyWorker>(24, TimeUnit.HOURS)
-            //     .setConstraints(constraints)
-            //     .build()
-            .build()
-
-        WorkManager.getInstance(this).enqueue(myWorkRequest)
+        workManager.enqueueUniquePeriodicWork(
+            "DailyNotificationWorker",
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            dailyWorkRequest
+        )
     }
 }
 

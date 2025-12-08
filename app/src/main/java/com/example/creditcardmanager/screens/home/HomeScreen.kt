@@ -256,12 +256,15 @@ fun CardSummary(card: CreditCard) {
             overflow = TextOverflow.Clip
         )
 
+        val statementMonth = Utils.getMonthName(card.currentStatementMonth)
+        val dueMonth = Utils.getMonthName(card.currentDueMonth)
+
         Text(modifier = Modifier.padding(bottom = 5.dp), text = buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
                 append(text = "Statement Date: ")
             }
             withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                append("${Utils.getStatementDateMonth(card.statementDay)} ${card.statementDay}")
+                append("$statementMonth ${card.statementDay}")
             }
         })
         Text(modifier = Modifier.padding(bottom = 5.dp), text = buildAnnotatedString {
@@ -269,7 +272,7 @@ fun CardSummary(card: CreditCard) {
                 append(text = "Due Date: ")
             }
             withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                append("${Utils.getDueDateMonth(card.dueDay, card.statementDay)} ${card.dueDay}")
+                append("$dueMonth ${card.dueDay}")
             }
         })
 

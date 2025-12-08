@@ -16,5 +16,7 @@ data class CreditCard(
     var statementDay: Int,
     var cardType: CreditCardType,
     var cardStatus: CreditCardStatus,
-    var lastUpdateDate: Date? = null
+    var lastUpdateDate: Date? = null,
+    var currentStatementMonth: Int? = null,
+    var currentDueMonth: Int? = null
 )
